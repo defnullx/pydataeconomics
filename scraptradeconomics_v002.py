@@ -14,8 +14,14 @@ class scraptbl(scrapy.Spider):
         'https://tradingeconomics.com/country-list/interest-rate?continent=world']
 
     def parse(self, response):
+        tableheader = '//div[@id="ctl00_ContentPlaceHolder1_ctl02_UpdatePanel1"]//div[@class="panel panel-default"]//div[@class="table-responsive"]//table[@class="table table-hover table-heatmap"]//thead//tr'
         tablevalues = '//div[@id="ctl00_ContentPlaceHolder1_ctl02_UpdatePanel1"]//div[@class="panel panel-default"]//div[@class="table-responsive"]//table[@class="table table-hover table-heatmap"]//tr'
+
+        for sel in response.xpath(tableheader):
+            dataheader = sel.xpath('normalize-space(.)').get()
+            print(dataheader)
+
         for sel in response.xpath(tablevalues):
-            data = sel.xpath('normalize-space(.)').get()
+            datavalues = sel.xpath('normalize-space(.)').get()
             #data1= data.replace(" ", ",")
-            print(data)
+            print(datavalues)

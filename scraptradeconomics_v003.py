@@ -28,21 +28,28 @@ class scraptbl(scrapy.Spider):
 
         for sel in response.xpath(tablevalues):
             #datavalues = sel.xpath('normalize-space(.)').get()
-            data1 = sel.xpath('normalize-space(./td[2]/.)').get()
-            data2 = sel.xpath('normalize-space(./td[3]/.)').get()
-            data3 = sel.xpath('normalize-space(./td[4]/.)').get()
-            
-            objtostr = str(data3)
-            print("data3: "+objtostr)
-            data3totime = datetime.strptime(objtostr, '%b%y')
+            last = sel.xpath('normalize-space(./td[2]/.)').get()
+            previous = sel.xpath('normalize-space(./td[3]/.)').get()
+            reference = sel.xpath('normalize-space(./td[4]/.)').extract_first(default="default_value")
+            reference = str(reference)
 
-            #data3totime = pd.to_datetime(data3, format='%y-%m-%d', infer_datetime_format=True)
-            
-            #print("datetotime: "+data3totime)
+            if reference == "":
+                continue
 
+            print("reference: "+reference)
+            referencedatetime = datetime.strptime(reference, "%b/%y")  # 09/21/22
+            print("referencedatetime: "+str(referencedatetime))
+            referencedate, referencetime = str(referencedatetime).split(" ")
+            print("referencedate: "+referencedate)
+            
+            referencedate = datetime.strptime(referencedate, "%Y-%m-%d")  # 09/21/22
+            date_time = referencedate.strftime("%d/%m/%Y")
+            print("referencedate_fixed: "+str(date_time))
+            #rdate = referencedate.
             #datavalues = str(data1)+","+str(data2)+","+str(data3totime)
             
-
+            #referencedate = datetime.strftime("%d/%m/%y")
+            #print("referencedate: "+referencedate)
             #print("values: "+str(data1)+","+str(data2)+","+str(data3))
             #print("values: "+datavalues)
 

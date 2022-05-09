@@ -2,9 +2,8 @@ from IPython.display import display
 from datetime import datetime
 import pandas as pd
 import scrapy
-from yaml import serialize
 
-csvfile01 = "tbl01"
+csvfile01 = "interest_rate_world.csv"
 csvfile02 = "tbl02"
 csvfile03 = "tbl03"
 
@@ -23,11 +22,8 @@ class scraptbl(scrapy.Spider):
         for sel in response.xpath(tableheader):
             dataheader = sel.xpath('normalize-space(.)').get()
             dataheader = dataheader.replace(" Unit", "")
-            #dataheader = dataheader.replace(" ",",")
             dataheader = str(dataheader)
-            print("dataheader string: "+dataheader)
             dataheaderlist = list(dataheader.split(" "))
-            print(dataheaderlist)
             df = pd.DataFrame(columns=dataheaderlist)
             display(df)
 
@@ -47,12 +43,12 @@ class scraptbl(scrapy.Spider):
             referencedate = datetime.strptime(referencedate, "%Y-%m-%d")
             date_time = referencedate.strftime("%m/%d/%Y")
 
-            print(datacountry, last, previous, date_time)
             datalist = str(datacountry)+","+str(last)+"," + \
                 str(previous)+","+str(date_time)
             datalist = list(datalist.split(","))
             dataseries = pd.Series(datalist, index=df.columns)
-            print(dataseries)
             df = df.append(dataseries, ignore_index=True)
 
         display(df)
+
+        df.to_csv(csvfile01, index=False)

@@ -13,15 +13,14 @@ class scraptbl(scrapy.Spider):
 
     def parse(self, response):
         tableheader =   '//div//table[@id="ctl00_ContentPlaceHolder1_ctl01_GridView1"]//thead//tr//th'
-        tablevalues =   '//div//table[@id="ctl00_ContentPlaceHolder1_ctl01_GridView1"]//tr/td'
+        tablevalues =   '//div//table[@id="ctl00_ContentPlaceHolder1_ctl01_GridView1"]//tr//td'
 
         df = pd.DataFrame()
 
-        dataheadervalue = "Country"
         xa=u'\xa0'
+        dataheadervalue = "Country"
         for sel in response.xpath(tableheader):
-            dataheader = str(sel.xpath('normalize-space(.)').get())
-            
+            dataheader = str(sel.xpath('normalize-space(.)').get(default=""))
             if xa in dataheader:
                 continue
 
@@ -29,19 +28,27 @@ class scraptbl(scrapy.Spider):
             dataheaderlist = list(dataheadervalue.split(","))
             df = pd.DataFrame(columns=dataheaderlist)
 
+
+        i = 0
+        datavalues = ""
         for sel in response.xpath(tablevalues):
-            datavalues = str(sel.xpath('normalize-space(.)').get() or None)
-            
-            if xa in datavalues:
-                continue
-            
-            if 'None' in datavalues:
+            datavalue = str(sel.xpath('normalize-space(.)').get(default=""))
+            if xa in datavalue:
                 continue
 
-            print(datavalues)
-            #datalist = list(datalist.split(","))
-            #dataseries = pd.Series(datalist, index=df.columns)
-            #df = df.append(dataseries, ignore_index=True)
+            datavalues = datavalues+"#"+datavalue
+
+            i += 1
+            if i == 12:
+                datavalues = datavalues[1:]
+                datavalueslist = list(datavalues.split("#"))
+                dataseries = pd.Series(datavalueslist, index=df.columns)
+                df = df.append(dataseries, ignore_index=True)
+                datavalues = ""
+                i = 0
+
+        display(df)
+        df.to_csv(csvfile01, index=False)
 
 
 process = CrawlerProcess({
@@ -50,4 +57,4 @@ process = CrawlerProcess({
 process.crawl(scraptbl)
 process.start() 
 
-#df.to_csv(csvfile01, index=False)
+

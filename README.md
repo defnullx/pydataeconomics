@@ -1,2 +1,2 @@
 # pydatascrape
-scrape data from website
+get table data from a public website
